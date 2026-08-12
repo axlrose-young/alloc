@@ -6,23 +6,27 @@
 
 typedef struct {         
 	size_t size;
+	void* prevblock;
 	bool isallocated;
 }Header;
 
 size_t headersize = sizeof(Header); // size of metadata
-
+void* prevblock = NULL;
+void* curr_programbreak;
 
 void* mem_pull(size_t size){
 	size += headersize; 	// includes metadata
 
 	Header h = {0};
 	h.size = size; 		// stores array size
-	h.isallocated = true; 
+	h.prevblock = prevblock;
 
 	void* p = sbrk(size);
+	h.isallocated = true;
+	prevblock = p;
+	curr_programbreak = sbrk(0);
 
 	memcpy(p, &h, headersize);
-
 	return p + headersize;
 }
 
@@ -37,13 +41,27 @@ void read_metadata(const void* p){
 		
 	printf("size of arr %ld\n",h->size);
 	printf("arr alloc bool  %d\n",h->isallocated);	
+	printf("prev block address  %p\n",h->prevblock);	
+	printf("curr block address  %p\n",tmp);	
+	puts("");
 }
 
 void mem_push(void* p){
-	p -= headersize;
-	Header* h = (Header*) p;
+	p -= headersize;		// points to curr start of block
+	Header* curr = (Header*) p;
 	
-	h->isallocated = false;
+	curr->isallocated = false;	// deallocate block
 
-	// give the last deallocation back to os
+	// check for prev block
+	if(curr->prevblock == NULL){
+		return;
+	}
+	Header* prev = (Header*)curr->prevblock;
+	if(!prev->isallocated){
+		prev->size += curr->size; // add sizes
+		if(curr_programbreak != (p + curr->size)){
+			Header* next = (Header*) (p + curr->size);
+			next->prevblock = prev->prevblock; 	// next to prev block addr
+		}			
+	}
 }

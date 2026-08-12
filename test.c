@@ -19,13 +19,20 @@ int main(){
 	for(int i = 0; i < SIZE; i++){
 		arr3[i] = 6;
 	}	
-	mem_push(arr2);
-	mem_push(arr3);
-
 	char* arr4 = mem_pull(SIZE);
 
 	read_metadata(arr1);
 	read_metadata(arr2);
 	read_metadata(arr3);
+	read_metadata(arr4);	
+
+	mem_push(arr2);
+	mem_push(arr3);
+	mem_push(arr1);
+
+	read_metadata(arr1);
+	read_metadata(arr2);
+	read_metadata(arr3);
 	read_metadata(arr4);
+	
 }
