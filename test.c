@@ -13,28 +13,19 @@ int main(){
 	for(int i = 0; i < SIZE; i++){
 		arr1[i] = 'c';
 	}
-
-	for(int i = 0; i < SIZE; i++){
-		printf("array %d: %c\n",i+1,arr1[i]);
-	}
-
 	for(int i = 0; i < SIZE*2; i++){
 		arr2[i] = 'i';
 	}
-
-	for(int i = 0; i < SIZE*2; i++){
-		printf("array %d: %c\n",i+1,arr2[i]);
-	}
-
 	for(int i = 0; i < SIZE; i++){
 		arr3[i] = 6;
-	}
+	}	
+	mem_push(arr2);
+	mem_push(arr3);
 
-	for(int i = 0; i < SIZE; i++){
-		printf("array %d: %d\n",i+1,arr3[i]);
-	}
+	char* arr4 = mem_pull(SIZE);
 
 	read_metadata(arr1);
 	read_metadata(arr2);
 	read_metadata(arr3);
+	read_metadata(arr4);
 }

@@ -2,6 +2,6 @@
 #define MEM_ALLOC
 
 void* mem_pull(size_t);
-void read_metadata(void*);
-
+void mem_push(void*);
+void read_metadata(const void*);
 #endif

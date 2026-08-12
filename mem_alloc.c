@@ -7,18 +7,18 @@
 typedef struct {         
 	size_t size;
 	bool isallocated;
-}header;
+}Header;
 
-size_t headersize = sizeof(header);
+size_t headersize = sizeof(Header); // size of metadata
+
 
 void* mem_pull(size_t size){
-	header h = {0};
-	h.size = size;
-	h.isallocated = true;
+	size += headersize; 	// includes metadata
 
-	printf("size of struct: %ld\n",headersize);
+	Header h = {0};
+	h.size = size; 		// stores array size
+	h.isallocated = true; 
 
-	size += headersize;
 	void* p = sbrk(size);
 
 	memcpy(p, &h, headersize);
@@ -26,9 +26,24 @@ void* mem_pull(size_t size){
 	return p + headersize;
 }
 
-void read_metadata(void* p){
+// Note: If arr pointer advanced then read metadata breaks 
+// To do: explore writing the mem start address into metadata
+
+// ONLY debug function
+void read_metadata(const void* p){ 
+	void* tmp = p;		
+	tmp -= headersize;	
+	Header* h = (Header*) tmp;
+		
+	printf("size of arr %ld\n",h->size);
+	printf("arr alloc bool  %d\n",h->isallocated);	
+}
+
+void mem_push(void* p){
 	p -= headersize;
-	header h;
-	memcpy(&h, p, headersize); 	
-	printf("size of arr %ld\n",h.size);
+	Header* h = (Header*) p;
+	
+	h->isallocated = false;
+
+	// give the last deallocation back to os
 }
