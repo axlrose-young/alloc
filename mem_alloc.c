@@ -7,12 +7,13 @@
 typedef struct {         
 	size_t size;
 	void* prevblock;
+	void* nextblock;
 	bool isallocated;
 }Header;
 
 size_t headersize = sizeof(Header); // size of metadata
 void* prevblock = NULL;
-void* curr_programbreak;
+void* nextblock = NULL;
 
 void* mem_pull(size_t size){
 	size += headersize; 	// includes metadata
@@ -23,8 +24,15 @@ void* mem_pull(size_t size){
 
 	void* p = sbrk(size);
 	h.isallocated = true;
+
 	prevblock = p;
-	curr_programbreak = sbrk(0);
+	nextblock = p;
+
+	// store nextblock value in prev alloc
+	if(h.prevblock != NULL){
+		Header* tmp = (Header*)h.prevblock;
+		tmp->nextblock = nextblock;
+	}
 
 	memcpy(p, &h, headersize);
 	return p + headersize;
@@ -41,8 +49,9 @@ void read_metadata(const void* p){
 		
 	printf("size of arr %ld\n",h->size);
 	printf("arr alloc bool  %d\n",h->isallocated);	
-	printf("prev block address  %p\n",h->prevblock);	
 	printf("curr block address  %p\n",tmp);	
+	printf("prev block address  %p\n",h->prevblock);	
+	printf("next block address  %p\n",h->nextblock);	
 	puts("");
 }
 
@@ -50,18 +59,31 @@ void mem_push(void* p){
 	p -= headersize;		// points to curr start of block
 	Header* curr = (Header*) p;
 	
-	curr->isallocated = false;	// deallocate block
+	curr->isallocated = false;	// deallocate block	
 
-	// check for prev block
-	if(curr->prevblock == NULL){
-		return;
+	/* Merge with prev if prev also deallocated
+	   And update next block's prev addr */	
+
+	if(curr->prevblock != NULL){ 
+		Header* prev = (Header*)curr->prevblock;
+		if(!prev->isallocated){
+			prev->size += curr->size;	
+			prev->nextblock = curr->nextblock;
+			if(curr->nextblock != NULL){
+				Header* next = (Header*)curr->nextblock;	
+				next->prevblock = curr->prevblock;
+			}
+			// current now points to merged block
+			curr = prev;
+		}
 	}
-	Header* prev = (Header*)curr->prevblock;
-	if(!prev->isallocated){
-		prev->size += curr->size; // add sizes
-		if(curr_programbreak != (p + curr->size)){
-			Header* next = (Header*) (p + curr->size);
-			next->prevblock = prev->prevblock; 	// next to prev block addr
-		}			
-	}
+	if(curr->nextblock != NULL){
+		Header* next = (Header*)curr->nextblock;
+		if(!next->isallocated){
+			curr->size += next->size;
+			if(next->nextblock != NULL){
+				curr->nextblock = next->nextblock;
+			}
+		}
+	}	
 }

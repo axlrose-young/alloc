@@ -20,19 +20,24 @@ int main(){
 		arr3[i] = 6;
 	}	
 	char* arr4 = mem_pull(SIZE);
+	char* arr5 = mem_pull(SIZE);
 
 	read_metadata(arr1);
 	read_metadata(arr2);
 	read_metadata(arr3);
 	read_metadata(arr4);	
-
+	read_metadata(arr5);	
+	
 	mem_push(arr2);
-	mem_push(arr3);
-	mem_push(arr1);
+	mem_push(arr4);
+	mem_push(arr5);
 
 	read_metadata(arr1);
+
+	mem_push(arr3);
+
 	read_metadata(arr2);
 	read_metadata(arr3);
 	read_metadata(arr4);
-	
+	read_metadata(arr5);
 }
