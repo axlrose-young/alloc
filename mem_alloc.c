@@ -6,14 +6,13 @@
 
 typedef struct {         
 	size_t size;
-	void* prevblock;
-	void* nextblock;
+	void* prevblock; // tail var to track last block
+	void* nextblock; // to track block position
 	bool isallocated;
 }Header;
 
 size_t headersize = sizeof(Header); // size of metadata
 void* prevblock = NULL;
-void* nextblock = NULL;
 
 void* mem_pull(size_t size){
 	size += headersize; 	// includes metadata
@@ -26,7 +25,7 @@ void* mem_pull(size_t size){
 	h.isallocated = true;
 
 	prevblock = p;
-	nextblock = p;
+	void* nextblock = p;
 
 	// store nextblock value in prev alloc
 	if(h.prevblock != NULL){
@@ -70,7 +69,7 @@ void mem_push(void* p){
 			prev->size += curr->size;	
 			prev->nextblock = curr->nextblock;
 			if(curr->nextblock != NULL){
-				Header* next = (Header*)curr->nextblock;	
+				Header* next = (Header*)curr->nextblock;
 				next->prevblock = curr->prevblock;
 			}
 			// current now points to merged block
@@ -81,9 +80,23 @@ void mem_push(void* p){
 		Header* next = (Header*)curr->nextblock;
 		if(!next->isallocated){
 			curr->size += next->size;
-			if(next->nextblock != NULL){
-				curr->nextblock = next->nextblock;
-			}
+			curr->nextblock = next->nextblock;
 		}
 	}	
+
+	/* change tail var "prevblock" position 
+	   Done if the last block was coalesced */	
+	Header* tail = (Header*) prevblock; 
+	if(tail->isallocated){
+		return;
+	}
+	// save the merged tail block 
+	tail = curr;
+
+	// walk prevblock back to last allocated
+	Header* walk = (Header*) prevblock;	
+	while(walk && !walk->isallocated){
+		walk = (Header*) walk->prevblock;
+	}
+	prevblock = walk;
 }
