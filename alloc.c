@@ -4,6 +4,7 @@
 
 #include "alloc.h"
 
+static int reuse_check();
 
 typedef struct {         
 	size_t size;
@@ -47,31 +48,63 @@ void* mem_pull(size_t size){
  *
  */
 
-struct Node* current = NULL; /* tracks alloc */
+struct Node* head = NULL; /* points to first block */
+struct Node* tail = NULL; /* tracks alloc */
 
 void* 
-alloc(size_t size) {
-	struct Node* block = sbrk(sizeof(struct Node) + size);	
-
-	if (block == (void*) -1) 
-		return NULL;
-
-	block->allocated = 1;
-	block->size = size;
-
-	if (current == NULL) 	/* first init */
-		current = block;	
-	else { 			/* filling prev block's next addr */
-		current->next = block;
-		current = block;
+alloc(size_t size) 
+{
+	if (reuse_check() == 0) { 	/* Check for block reusability */
+	//	return reuse_block();
 	}
+	else {
+		/* Normal alloc */
+		struct Node* block = sbrk(sizeof(struct Node) + size);	
+
+		if (block == (void*) -1) 
+			return NULL;
+
+		block->allocated = 1;
+		block->size = size;
+
+		if (tail == NULL) { 	/* first init */
+			tail = block;	
+			head = block;
+		} else { 		/* filling prev block's next addr */
+			tail->next = block;
+			tail = block;
+		}
 		
+		return (void*)(block + 1);
+	}
+}
+
+static int 
+reuse_check() {
+	struct Node* x = head;	
+	if (x == NULL) { 	/* Check if head is valid */
+		return 1;
+	}
+
+	while(x->next != NULL) {
+		if (!x->allocated) {
+			printf("this block might be reusable");	
+			return 0; 
+		}	
+		x = x->next;
+	}	
+
+	return 1;
+}
+
+void 
+reuse_block() {
 	
-	return (void*)(block + 1);
 }
 
 void
-unbound(void* p) {
+unbound(void* p) 
+{
 	struct Node* block = (struct Node*)p - 1;	
 
 	if (!block->allocated) {
@@ -80,13 +113,12 @@ unbound(void* p) {
 	}
 
 	block->allocated = 0;
-
-	read_metadata(block + 1);
 }
 
 // Note: If arr pointer advanced then read metadata breaks 
 void 
-read_metadata(void* p) { 
+read_metadata(void* p) 
+{ 
 	struct Node* rd = (struct Node*)p - 1;	
 	
 	printf("curr block addr %p\n",rd);

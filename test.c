@@ -13,7 +13,6 @@ int main(){
 	read_metadata(arr7);
 
 	unbound(arr6);
-	unbound(arr6);
 	
 	/*
 	read_metadata(arr1);
