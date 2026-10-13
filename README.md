@@ -11,7 +11,7 @@ make all
 ```
 
 Usage:
-
+In your C file
 ```c
 #include "alloc.h"
 ```
