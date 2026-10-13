@@ -9,32 +9,11 @@ int main(){
 	char* arr6 = alloc(100);
 
 	char* arr7 = alloc(200);
-	read_metadata(arr6);
-	read_metadata(arr7);
 
 	unbound(arr7);
-
 	read_metadata(arr7);
+
 	char* arr8 = alloc(50);
-	
-	/*
-	read_metadata(arr1);
-	read_metadata(arr2);
-	read_metadata(arr3);
-	read_metadata(arr4);	
-	read_metadata(arr5);	
-	
-	mem_push(arr2);
-	mem_push(arr4);
-	mem_push(arr5);
-
-	read_metadata(arr1);
-
-	mem_push(arr3);
-
-	read_metadata(arr2);
-	read_metadata(arr3);
-	read_metadata(arr4);
-	read_metadata(arr5);
-	*/
+	read_metadata(arr6);
+	read_metadata(arr8);	
 }

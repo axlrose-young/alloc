@@ -9,9 +9,6 @@ struct Node {
 
 void* alloc(size_t);
 void unbound(void*);
-
-void* mem_pull(size_t);
-void mem_push(void*);
 void read_metadata(void*);
 
 #endif
