@@ -4,7 +4,7 @@
 
 #include "alloc.h"
 
-static int reuse_check();
+static int reuse_check(size_t);
 
 typedef struct {         
 	size_t size;
@@ -54,7 +54,8 @@ struct Node* tail = NULL; /* tracks alloc */
 void* 
 alloc(size_t size) 
 {
-	if (reuse_check() == 0) { 	/* Check for block reusability */
+	if (reuse_check(size) == 0) { 	/* Check for block reusability */
+		puts("Ye can be reused");
 	//	return reuse_block();
 	}
 	else {
@@ -80,17 +81,15 @@ alloc(size_t size)
 }
 
 static int 
-reuse_check() {
+reuse_check(size_t size) {
 	struct Node* x = head;	
 	if (x == NULL) { 	/* Check if head is valid */
 		return 1;
 	}
 
-	while(x->next != NULL) {
-		if (!x->allocated) {
-			printf("this block might be reusable");	
-			return 0; 
-		}	
+	while(x != NULL) {
+		if ((!x->allocated) && (x->size > size)) 	
+			return 0;
 		x = x->next;
 	}	
 

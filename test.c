@@ -12,7 +12,10 @@ int main(){
 	read_metadata(arr6);
 	read_metadata(arr7);
 
-	unbound(arr6);
+	unbound(arr7);
+
+	read_metadata(arr7);
+	char* arr8 = alloc(50);
 	
 	/*
 	read_metadata(arr1);
