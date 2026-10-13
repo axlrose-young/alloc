@@ -17,7 +17,7 @@ Usage:
 ```
 compile the program:
 
-'''c
+'''sh
 gcc main.c -L. -lalloc -o main
 '''
 
