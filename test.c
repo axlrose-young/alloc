@@ -2,10 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "mem_alloc.h"
+#include "alloc.h"
 #define SIZE 10
 
 int main(){
+<<<<<<< HEAD
 	char* arr1 = mem_pull(SIZE);
 	//int* arr3 = mem_pull(SIZE*4);		
 	//char* arr4 = mem_pull(SIZE);
@@ -31,4 +32,13 @@ int main(){
 	//read_metadata(arr5);
 	//read_metadata(arr6);
 	//read_metadata(arr7);
+=======
+
+	void* ptr = alloc(100);
+	unbound(ptr);
+
+	printf("This ran\n");
+
+	return 0;
+>>>>>>> refactor
 }
